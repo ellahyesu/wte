@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "4173:4173"
+    environment:
+      VITE_API_BASE_URL: http://backend:8080
+    depends_on:
+      - backend
