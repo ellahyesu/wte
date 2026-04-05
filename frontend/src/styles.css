@@ -298,6 +298,25 @@ textarea {
   font-weight: 600;
 }
 
+.partner-banner {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+}
+
+.partner-banner a {
+  display: block;
+  width: min(100%, 728px);
+}
+
+.partner-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: 18px;
+}
+
 .stack {
   display: grid;
   gap: 14px;

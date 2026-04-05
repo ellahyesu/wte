@@ -480,6 +480,15 @@ onMounted(async () => {
       </section>
     </main>
 
+    <div class="partner-banner">
+      <a href="https://link.coupang.com/a/eiMVec" target="_blank" referrerpolicy="unsafe-url">
+        <img
+          src="https://ads-partners.coupang.com/banners/918364?subId=&traceId=V0-301-371ae01f4226dec2-I918364&w=728&h=90"
+          alt=""
+        />
+      </a>
+    </div>
+
     <div v-if="selectedRecipe" class="modal-backdrop" @click.self="closeRecipeModal">
       <section class="modal-card">
         <div class="section-head">
