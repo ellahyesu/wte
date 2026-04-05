@@ -110,10 +110,6 @@ function textOf(value: { ko: string; en: string }): string {
 }
 
 function nutritionText(value: number | null, unit: string): string {
-  if (value === null || value === undefined) {
-    return locale.value === 'ko' ? '정보 없음' : 'Not available';
-  }
-
   return `${value}${unit}`;
 }
 
@@ -121,6 +117,24 @@ function hasNutrition(nutrition: ApiRecipe['nutrition'] | Recipe['nutrition']): 
   return [nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].some(
     (value) => value !== null && value !== undefined,
   );
+}
+
+function nutritionLabel(type: 'calories' | 'protein' | 'carbs' | 'fat'): string {
+  if (locale.value === 'ko') {
+    return {
+      calories: '칼로리',
+      protein: '단백질',
+      carbs: '탄수화물',
+      fat: '지방',
+    }[type];
+  }
+
+  return {
+    calories: 'Calories',
+    protein: 'Protein',
+    carbs: 'Carbs',
+    fat: 'Fat',
+  }[type];
 }
 
 function recipeImageUrl(value: string | null | undefined): string {
@@ -309,17 +323,17 @@ onMounted(async () => {
           <button class="image-button" @click="openRecipeModal(recipe)">
             <img :src="recipeImageUrl(recipe.imageUrl)" :alt="textOf(recipe.title)" class="card-image" @error="applyFallbackImage" />
           </button>
-          <div class="card-body">
+          <div :class="['card-body', { 'no-nutrition': !hasNutrition(recipe.nutrition) }]">
             <div class="chip-row">
               <span v-for="tag in recipe.tags" :key="tag.en" class="chip">{{ textOf(tag) }}</span>
             </div>
             <h3>{{ textOf(recipe.title) }}</h3>
             <p>{{ textOf(recipe.summary) }}</p>
             <div v-if="hasNutrition(recipe.nutrition)" class="nutrition">
-              <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
-              <span>P {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
-              <span>C {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
-              <span>F {{ nutritionText(recipe.nutrition.fat, 'g') }}</span>
+              <span v-if="recipe.nutrition.calories !== null">{{ nutritionLabel('calories') }} {{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
+              <span v-if="recipe.nutrition.protein !== null">{{ nutritionLabel('protein') }} {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
+              <span v-if="recipe.nutrition.carbs !== null">{{ nutritionLabel('carbs') }} {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
+              <span v-if="recipe.nutrition.fat !== null">{{ nutritionLabel('fat') }} {{ nutritionText(recipe.nutrition.fat, 'g') }}</span>
             </div>
           </div>
         </article>
@@ -348,17 +362,17 @@ onMounted(async () => {
           <button class="image-button" @click="openRecipeModal(recipe)">
             <img :src="recipeImageUrl(recipe.imageUrl)" :alt="textOf(recipe.title)" class="card-image" @error="applyFallbackImage" />
           </button>
-          <div class="card-body">
+          <div :class="['card-body', { 'no-nutrition': !hasNutrition(recipe.nutrition) }]">
             <div class="chip-row">
               <span v-for="tag in recipe.tags" :key="tag.en" class="chip">{{ textOf(tag) }}</span>
             </div>
             <h3>{{ textOf(recipe.title) }}</h3>
             <p>{{ textOf(recipe.summary) }}</p>
             <div v-if="hasNutrition(recipe.nutrition)" class="nutrition">
-              <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
-              <span>P {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
-              <span>C {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
-              <span>F {{ nutritionText(recipe.nutrition.fat, 'g') }}</span>
+              <span v-if="recipe.nutrition.calories !== null">{{ nutritionLabel('calories') }} {{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
+              <span v-if="recipe.nutrition.protein !== null">{{ nutritionLabel('protein') }} {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
+              <span v-if="recipe.nutrition.carbs !== null">{{ nutritionLabel('carbs') }} {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
+              <span v-if="recipe.nutrition.fat !== null">{{ nutritionLabel('fat') }} {{ nutritionText(recipe.nutrition.fat, 'g') }}</span>
             </div>
           </div>
         </article>
@@ -434,9 +448,9 @@ onMounted(async () => {
           <strong>{{ plan.targetCalories }} kcal</strong>
         </div>
         <div class="nutrition">
-          <span>P {{ plan.macroTargets.protein }}g</span>
-          <span>C {{ plan.macroTargets.carbs }}g</span>
-          <span>F {{ plan.macroTargets.fat }}g</span>
+          <span>{{ nutritionLabel('protein') }} {{ plan.macroTargets.protein }}g</span>
+          <span>{{ nutritionLabel('carbs') }} {{ plan.macroTargets.carbs }}g</span>
+          <span>{{ nutritionLabel('fat') }} {{ plan.macroTargets.fat }}g</span>
         </div>
         <article v-for="meal in plan.meals" :key="meal.mealType" class="meal-block">
           <div class="section-head">

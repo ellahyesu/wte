@@ -189,6 +189,10 @@ textarea {
   height: 190px;
 }
 
+.card-body.no-nutrition {
+  height: 140px;
+}
+
 .ingredient-list,
 .note-list {
   padding: 0;
