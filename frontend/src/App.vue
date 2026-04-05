@@ -269,7 +269,7 @@ onMounted(async () => {
           <button :class="['locale-button', { active: locale === 'en' }]" @click="switchLocale('en')">{{ copy.en }}</button>
         </div>
       </div>
-      <h3>{{ copy.heroTitle }}</h3>
+      <h2>{{ copy.heroTitle }}</h2>
       <p class="lede">{{ copy.heroText }}</p>
       <div class="tab-row">
         <button v-for="tab in tabs" :key="tab" :class="['tab', { active: activeTab === tab }]" @click="activeTab = tab">
