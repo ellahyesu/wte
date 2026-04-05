@@ -1,8 +1,10 @@
 package com.wte.backend;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -58,5 +60,14 @@ class WteApiTests {
                 .andExpect(jsonPath("$.user").value("Mina"))
                 .andExpect(jsonPath("$.targetCalories").isNumber())
                 .andExpect(jsonPath("$.meals[0].mealType").value("Breakfast"));
+    }
+
+    @Test
+    void allowsCorsForNetlifyFrontend() throws Exception {
+        mockMvc.perform(options("/api/recipes")
+                        .header("Origin", "https://wte-whattoeat.netlify.app")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "https://wte-whattoeat.netlify.app"));
     }
 }
