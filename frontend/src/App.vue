@@ -46,14 +46,14 @@ const form = ref({
 });
 
 const copy = computed(() => ({
-  heroTitle: locale.value === 'ko' ? '오늘 먹을 메뉴와 영양 계획을 한 화면에서 정리합니다.' : 'Your meals, nutrition targets, and shopping links in one place.',
+  heroTitle: locale.value === 'ko' ? '오늘 뭐 먹을까?' : 'Your meals, nutrition targets, and shopping links in one place.',
   heroText:
     locale.value === 'ko'
-      ? '기본 언어는 한국어이며, 레시피 카드, 식단 추천, pantry 기반 추천을 한 앱에서 확인할 수 있습니다.'
+      ? '레시피, 영양소, 냉장고 기반 메뉴 추천을 한 앱에서 확인할 수 있습니다.'
       : 'Switch the language anytime and explore recipe cards, diet planning, and pantry-first suggestions in one app.',
-  recipeCards: locale.value === 'ko' ? '레시피 카드' : 'Recipe Cards',
+  recipeCards: locale.value === 'ko' ? '레시피' : 'Recipe Cards',
   dietitian: locale.value === 'ko' ? 'AI 영양사' : 'AI Dietitian',
-  pantry: locale.value === 'ko' ? '냉장고 레시피' : 'My Pantry',
+  pantry: locale.value === 'ko' ? '냉장고 책임져' : 'My Pantry',
   demoNotice:
     locale.value === 'ko'
       ? '현재는 데모 모드입니다. 연결 가능한 백엔드 API가 없어 내장 데이터로 동작합니다.'
@@ -269,7 +269,7 @@ onMounted(async () => {
           <button :class="['locale-button', { active: locale === 'en' }]" @click="switchLocale('en')">{{ copy.en }}</button>
         </div>
       </div>
-      <h1>{{ copy.heroTitle }}</h1>
+      <h3>{{ copy.heroTitle }}</h3>
       <p class="lede">{{ copy.heroText }}</p>
       <div class="tab-row">
         <button v-for="tab in tabs" :key="tab" :class="['tab', { active: activeTab === tab }]" @click="activeTab = tab">
