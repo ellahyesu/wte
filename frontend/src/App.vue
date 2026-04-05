@@ -31,6 +31,7 @@ const loadingPlan = ref(false);
 const loadingPantry = ref(false);
 const error = ref('');
 const usingDemoData = ref(false);
+const fallbackRecipeImage = '/favicon.svg';
 
 const form = ref({
   name: 'Mina',
@@ -110,6 +111,18 @@ function nutritionText(value: number | null, unit: string): string {
   }
 
   return `${value}${unit}`;
+}
+
+function recipeImageUrl(value: string | null | undefined): string {
+  return value && value.trim() ? value : fallbackRecipeImage;
+}
+
+function applyFallbackImage(event: Event) {
+  const image = event.target as HTMLImageElement;
+  if (image.src.endsWith(fallbackRecipeImage)) {
+    return;
+  }
+  image.src = fallbackRecipeImage;
 }
 
 function normalizeApiRecipe(recipe: ApiRecipe): Recipe {
@@ -276,7 +289,7 @@ onMounted(async () => {
       <div class="grid">
         <article v-for="recipe in overviewRecipes" :key="recipe.id" class="card">
           <button class="image-button" @click="openRecipeModal(recipe)">
-            <img :src="recipe.imageUrl" :alt="textOf(recipe.title)" class="card-image" />
+            <img :src="recipeImageUrl(recipe.imageUrl)" :alt="textOf(recipe.title)" class="card-image" @error="applyFallbackImage" />
           </button>
           <div class="card-body">
             <div class="chip-row">
@@ -315,7 +328,7 @@ onMounted(async () => {
       <div class="grid">
         <article v-for="recipe in archiveRecipes" :key="recipe.id" class="card">
           <button class="image-button" @click="openRecipeModal(recipe)">
-            <img :src="recipe.imageUrl" :alt="textOf(recipe.title)" class="card-image" />
+            <img :src="recipeImageUrl(recipe.imageUrl)" :alt="textOf(recipe.title)" class="card-image" @error="applyFallbackImage" />
           </button>
           <div class="card-body">
             <div class="chip-row">
@@ -456,7 +469,7 @@ onMounted(async () => {
           </div>
           <button class="ghost" @click="closeRecipeModal">Close</button>
         </div>
-        <img :src="selectedRecipe.imageUrl" :alt="textOf(selectedRecipe.title)" class="modal-image" />
+        <img :src="recipeImageUrl(selectedRecipe.imageUrl)" :alt="textOf(selectedRecipe.title)" class="modal-image" @error="applyFallbackImage" />
         <div class="modal-grid">
           <div>
             <h4>{{ copy.ingredients }}</h4>
