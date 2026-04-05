@@ -10,7 +10,7 @@ type ApiRecipe = {
   tags: string[];
   ingredients: { name: string; amount: string; purchaseUrl: string }[];
   instructions: string[];
-  nutrition: { calories: number; protein: number; carbs: number; fat: number };
+  nutrition: { calories: number | null; protein: number | null; carbs: number | null; fat: number | null };
 };
 
 const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim();
@@ -102,6 +102,14 @@ const archiveRecipes = computed(() => recipes.value.slice(16));
 
 function textOf(value: { ko: string; en: string }): string {
   return localizeText(value, locale.value);
+}
+
+function nutritionText(value: number | null, unit: string): string {
+  if (value === null || value === undefined) {
+    return locale.value === 'ko' ? '정보 없음' : 'Not available';
+  }
+
+  return `${value}${unit}`;
 }
 
 function normalizeApiRecipe(recipe: ApiRecipe): Recipe {
@@ -277,10 +285,10 @@ onMounted(async () => {
             <h3>{{ textOf(recipe.title) }}</h3>
             <p>{{ textOf(recipe.summary) }}</p>
             <div class="nutrition">
-              <span>{{ recipe.nutrition.calories }} kcal</span>
-              <span>P {{ recipe.nutrition.protein }}g</span>
-              <span>C {{ recipe.nutrition.carbs }}g</span>
-              <span>F {{ recipe.nutrition.fat }}g</span>
+              <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
+              <span>P {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
+              <span>C {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
+              <span>F {{ nutritionText(recipe.nutrition.fat, 'g') }}</span>
             </div>
           </div>
         </article>
@@ -316,10 +324,10 @@ onMounted(async () => {
             <h3>{{ textOf(recipe.title) }}</h3>
             <p>{{ textOf(recipe.summary) }}</p>
             <div class="nutrition">
-              <span>{{ recipe.nutrition.calories }} kcal</span>
-              <span>P {{ recipe.nutrition.protein }}g</span>
-              <span>C {{ recipe.nutrition.carbs }}g</span>
-              <span>F {{ recipe.nutrition.fat }}g</span>
+              <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
+              <span>P {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
+              <span>C {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
+              <span>F {{ nutritionText(recipe.nutrition.fat, 'g') }}</span>
             </div>
           </div>
         </article>
@@ -432,7 +440,7 @@ onMounted(async () => {
             <p>{{ textOf(recipe.summary) }}</p>
           </div>
           <div class="compact-actions">
-            <span>{{ recipe.nutrition.calories }} kcal</span>
+            <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
             <a :href="recipe.ingredients[0].purchaseUrl" target="_blank" rel="noreferrer">{{ locale === 'ko' ? '장보기' : 'Shop' }}</a>
           </div>
         </article>

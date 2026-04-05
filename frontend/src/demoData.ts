@@ -13,10 +13,10 @@ export type Ingredient = {
 };
 
 export type Nutrition = {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
+  calories: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
 };
 
 export type MacroTargets = {

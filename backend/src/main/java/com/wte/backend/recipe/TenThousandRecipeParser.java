@@ -87,21 +87,21 @@ public class TenThousandRecipeParser {
 
     private Nutrition parseNutrition(Document document) {
         List<Element> values = document.select(".view2_summary_info span");
-        int calories = extractNumber(document.selectFirst(".view2_summary_info4"));
-        if (calories == 0 && values.size() > 3) {
+        Integer calories = extractNumber(document.selectFirst(".view2_summary_info4"));
+        if (calories == null && values.size() > 3) {
             calories = extractNumber(values.get(3));
         }
 
-        return new Nutrition(calories, 0, 0, 0);
+        return new Nutrition(calories, null, null, null);
     }
 
-    private int extractNumber(Element element) {
+    private Integer extractNumber(Element element) {
         if (element == null) {
-            return 0;
+            return null;
         }
 
         String digits = element.text().replaceAll("[^0-9]", "");
-        return digits.isBlank() ? 0 : Integer.parseInt(digits);
+        return digits.isBlank() ? null : Integer.parseInt(digits);
     }
 
     private String textOrFallback(Element element, String fallback) {
