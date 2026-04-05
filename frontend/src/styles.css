@@ -253,6 +253,31 @@ textarea {
   color: #5b6d63;
 }
 
+.loading-state {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: #5b6d63;
+}
+
+.loading-copy {
+  max-width: 32ch;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border: 2px solid rgba(31, 107, 79, 0.18);
+  border-top-color: #1f6b4f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
 .ingredients-inline,
 .error,
 .notice,
@@ -344,6 +369,12 @@ textarea {
   font-weight: 600;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 720px) {
   .shell {
     padding-inline: 14px;
@@ -360,6 +391,14 @@ textarea {
   .compact-card {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .loading-state {
+    justify-content: flex-start;
+  }
+
+  .loading-copy {
+    text-align: left;
   }
 
   .form-grid {

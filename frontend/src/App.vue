@@ -60,6 +60,10 @@ const copy = computed(() => ({
       : 'Running in demo mode. This deployment uses built-in data because no reachable backend API is configured.',
   recipesCount: (count: number) => (locale.value === 'ko' ? `레시피 ${count}개` : `${count} recipes`),
   loading: locale.value === 'ko' ? '불러오는 중...' : 'loading...',
+  loadingHint:
+    locale.value === 'ko'
+      ? '무료 백엔드 서버를 사용 중이라 첫 로딩이 조금 느릴 수 있습니다.'
+      : 'The first load may take a bit longer because this runs on a free backend server.',
   openRecipe: locale.value === 'ko' ? '레시피 보기' : 'View recipe',
   ingredients: locale.value === 'ko' ? '재료' : 'Ingredients',
   instructions: locale.value === 'ko' ? '조리 순서' : 'Instructions',
@@ -251,6 +255,10 @@ function closeRecipeModal() {
   selectedRecipe.value = null;
 }
 
+function loadingLabel(fallback: string): string {
+  return locale.value === 'ko' ? '불러오는 중...' : fallback;
+}
+
 onMounted(async () => {
   await fetchRecipes();
   await fetchPantryMatches();
@@ -284,7 +292,11 @@ onMounted(async () => {
     <main v-if="activeTab === 'recipes' && recipeView === 'overview'" class="panel">
       <div class="section-head">
         <h2>{{ copy.recipeCards }}</h2>
-        <span>{{ loadingRecipes ? copy.loading : copy.recipesCount(recipes.length) }}</span>
+        <div v-if="loadingRecipes" class="loading-state" :aria-label="loadingLabel('Loading recipes...')" aria-live="polite" role="status">
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="loading-copy">{{ copy.loadingHint }}</span>
+        </div>
+        <span v-else>{{ copy.recipesCount(recipes.length) }}</span>
       </div>
       <div class="grid">
         <article v-for="recipe in overviewRecipes" :key="recipe.id" class="card">
@@ -351,7 +363,11 @@ onMounted(async () => {
       <section class="form-card">
         <div class="section-head">
           <h2>{{ copy.dietitian }}</h2>
-          <span>{{ loadingPlan ? copy.loading : 'TDEE-based' }}</span>
+          <div v-if="loadingPlan" class="loading-state" :aria-label="loadingLabel('Loading your plan...')" aria-live="polite" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="loading-copy">{{ copy.loadingHint }}</span>
+          </div>
+          <span v-else>TDEE-based</span>
         </div>
         <div class="form-grid">
           <label>
@@ -434,7 +450,11 @@ onMounted(async () => {
       <section class="form-card">
         <div class="section-head">
           <h2>{{ copy.pantry }}</h2>
-          <span>{{ loadingPantry ? copy.searching : copy.matches(pantryMatches.length) }}</span>
+          <div v-if="loadingPantry" class="loading-state" :aria-label="loadingLabel('Loading pantry matches...')" aria-live="polite" role="status">
+            <span class="spinner" aria-hidden="true"></span>
+            <span class="loading-copy">{{ copy.loadingHint }}</span>
+          </div>
+          <span v-else>{{ copy.matches(pantryMatches.length) }}</span>
         </div>
         <label>
           {{ copy.pantryInput }}
