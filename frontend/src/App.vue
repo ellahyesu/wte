@@ -15,7 +15,8 @@ type ApiRecipe = {
 
 const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim();
 const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-const apiBase = configuredApiBase ?? (isLocalHost ? 'http://localhost:8080' : '');
+const defaultProductionApiBase = 'https://wte-oqhr.onrender.com';
+const apiBase = configuredApiBase ?? (isLocalHost ? 'http://localhost:8080' : defaultProductionApiBase);
 const tabs = ['recipes', 'diet', 'pantry'] as const;
 const locale = ref<Locale>('ko');
 const activeTab = ref<'recipes' | 'diet' | 'pantry'>('recipes');
