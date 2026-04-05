@@ -1,51 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { buildDemoMealPlan, demoRecipes, recommendDemoRecipes, type MealPlan, type Recipe } from './demoData';
 
-type Ingredient = {
-  name: string;
-  amount: string;
-  purchaseUrl: string;
-};
-
-type Nutrition = {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-};
-
-type MacroTargets = {
-  protein: number;
-  carbs: number;
-  fat: number;
-};
-
-type Recipe = {
-  id: string;
-  title: string;
-  summary: string;
-  imageUrl: string;
-  tags: string[];
-  ingredients: Ingredient[];
-  instructions: string[];
-  nutrition: Nutrition;
-};
-
-type MealPlan = {
-  user: string;
-  targetCalories: number;
-  macroTargets: MacroTargets;
-  meals: {
-    mealType: string;
-    title: string;
-    rationale: string;
-    ingredients: string[];
-    nutrition: Nutrition;
-  }[];
-  notes: string[];
-};
-
-const apiBase = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim();
+const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const apiBase = configuredApiBase ?? (isLocalHost ? 'http://localhost:8080' : '');
 const tabs = ['recipes', 'diet', 'pantry'] as const;
 const activeTab = ref<'recipes' | 'diet' | 'pantry'>('recipes');
 const recipes = ref<Recipe[]>([]);
@@ -56,6 +15,7 @@ const loadingRecipes = ref(false);
 const loadingPlan = ref(false);
 const loadingPantry = ref(false);
 const error = ref('');
+const usingDemoData = ref(false);
 
 const form = ref({
   name: 'Mina',
@@ -79,11 +39,22 @@ const pantryList = computed(() =>
 async function fetchRecipes() {
   loadingRecipes.value = true;
   error.value = '';
+  if (!apiBase) {
+    recipes.value = demoRecipes;
+    usingDemoData.value = true;
+    loadingRecipes.value = false;
+    return;
+  }
+
   try {
     const response = await fetch(`${apiBase}/api/recipes`);
+    if (!response.ok) {
+      throw new Error(`Recipe API failed with ${response.status}`);
+    }
     recipes.value = await response.json();
   } catch {
-    error.value = 'Failed to load recipes. Check whether the backend is running.';
+    recipes.value = demoRecipes;
+    usingDemoData.value = true;
   } finally {
     loadingRecipes.value = false;
   }
@@ -91,13 +62,23 @@ async function fetchRecipes() {
 
 async function fetchPantryMatches() {
   loadingPantry.value = true;
-  error.value = '';
+  if (!apiBase) {
+    pantryMatches.value = recommendDemoRecipes(pantryList.value);
+    usingDemoData.value = true;
+    loadingPantry.value = false;
+    return;
+  }
+
   try {
     const query = encodeURIComponent(pantryList.value.join(','));
     const response = await fetch(`${apiBase}/api/recipes/pantry?items=${query}`);
+    if (!response.ok) {
+      throw new Error(`Pantry API failed with ${response.status}`);
+    }
     pantryMatches.value = await response.json();
   } catch {
-    error.value = 'Failed to load pantry recommendations.';
+    pantryMatches.value = recommendDemoRecipes(pantryList.value);
+    usingDemoData.value = true;
   } finally {
     loadingPantry.value = false;
   }
@@ -105,20 +86,32 @@ async function fetchPantryMatches() {
 
 async function generatePlan() {
   loadingPlan.value = true;
-  error.value = '';
+  const requestBody = {
+    ...form.value,
+    preferredIngredients: form.value.preferredIngredients.split(',').map((item) => item.trim()).filter(Boolean),
+    dislikedIngredients: form.value.dislikedIngredients.split(',').map((item) => item.trim()).filter(Boolean),
+  };
+
+  if (!apiBase) {
+    plan.value = buildDemoMealPlan(requestBody);
+    usingDemoData.value = true;
+    loadingPlan.value = false;
+    return;
+  }
+
   try {
     const response = await fetch(`${apiBase}/api/diet/plan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form.value,
-        preferredIngredients: form.value.preferredIngredients.split(',').map((item) => item.trim()).filter(Boolean),
-        dislikedIngredients: form.value.dislikedIngredients.split(',').map((item) => item.trim()).filter(Boolean),
-      }),
+      body: JSON.stringify(requestBody),
     });
+    if (!response.ok) {
+      throw new Error(`Diet API failed with ${response.status}`);
+    }
     plan.value = await response.json();
   } catch {
-    error.value = 'Failed to generate the meal plan.';
+    plan.value = buildDemoMealPlan(requestBody);
+    usingDemoData.value = true;
   } finally {
     loadingPlan.value = false;
   }
@@ -152,6 +145,9 @@ onMounted(async () => {
     </header>
 
     <p v-if="error" class="error">{{ error }}</p>
+    <p v-if="usingDemoData" class="notice">
+      Running in demo mode. This deployment uses built-in data because no reachable backend API is configured.
+    </p>
 
     <main v-if="activeTab === 'recipes'" class="panel">
       <div class="section-head">

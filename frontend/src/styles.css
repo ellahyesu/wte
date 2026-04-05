@@ -204,9 +204,18 @@ textarea {
 
 .ingredients-inline,
 .error,
+.notice,
 .compact-card p,
 .card p {
   color: #5b6d63;
+}
+
+.notice {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: rgba(31, 107, 79, 0.1);
+  font-weight: 600;
 }
 
 .stack {
