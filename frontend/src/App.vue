@@ -117,6 +117,12 @@ function nutritionText(value: number | null, unit: string): string {
   return `${value}${unit}`;
 }
 
+function hasNutrition(nutrition: ApiRecipe['nutrition'] | Recipe['nutrition']): boolean {
+  return [nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].some(
+    (value) => value !== null && value !== undefined,
+  );
+}
+
 function recipeImageUrl(value: string | null | undefined): string {
   return value && value.trim() ? value : fallbackRecipeImage;
 }
@@ -309,7 +315,7 @@ onMounted(async () => {
             </div>
             <h3>{{ textOf(recipe.title) }}</h3>
             <p>{{ textOf(recipe.summary) }}</p>
-            <div class="nutrition">
+            <div v-if="hasNutrition(recipe.nutrition)" class="nutrition">
               <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
               <span>P {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
               <span>C {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
@@ -348,7 +354,7 @@ onMounted(async () => {
             </div>
             <h3>{{ textOf(recipe.title) }}</h3>
             <p>{{ textOf(recipe.summary) }}</p>
-            <div class="nutrition">
+            <div v-if="hasNutrition(recipe.nutrition)" class="nutrition">
               <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
               <span>P {{ nutritionText(recipe.nutrition.protein, 'g') }}</span>
               <span>C {{ nutritionText(recipe.nutrition.carbs, 'g') }}</span>
@@ -473,7 +479,7 @@ onMounted(async () => {
             <p>{{ textOf(recipe.summary) }}</p>
           </div>
           <div class="compact-actions">
-            <span>{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
+            <span v-if="hasNutrition(recipe.nutrition)">{{ nutritionText(recipe.nutrition.calories, ' kcal') }}</span>
             <a :href="recipe.ingredients[0].purchaseUrl" target="_blank" rel="noreferrer">{{ locale === 'ko' ? '장보기' : 'Shop' }}</a>
           </div>
         </article>
