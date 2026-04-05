@@ -182,8 +182,11 @@ textarea {
 .plan-card,
 .compact-card,
 .modal-card {
-  flex: 1;
   padding: 18px;
+}
+
+.card-body {
+  height: 190px;
 }
 
 .ingredient-list,
